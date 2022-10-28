@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+sqlalchemy = "*"
+flask-bcrypt = "*"
+pysqlite3 = "*"
+flask-sqlalchemy = "*"
+flask-cors = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
+
+[script]
+dev = "bash -c \"export FLASK_ENV='development' && flask run --host=0.0.0.0 \""
+test = "pytest ."
+coverage = "pytest --cov-report term-missing --cov=."
