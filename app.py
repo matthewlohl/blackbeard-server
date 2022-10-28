@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
-from flask_marshmallow import Marshmallow
+# from flask_marshmallow import Marshmallow
 
 from config import ApplicationConfig
 
@@ -16,7 +16,7 @@ app.config.from_object(ApplicationConfig)
 # --- using dependencies in app ---
 
 bcrypt = Bcrypt(app)
-ma = Marshmallow(app)
+# ma = Marshmallow(app)
 cors = CORS(app, resource={
     r"/*": {
         "origins": "*"
@@ -24,12 +24,12 @@ cors = CORS(app, resource={
 }, supports_credentials=True)
 
 # --- Define your output format with marshmallow. --- 
-class UserSchema(ma.Schema):
-    class Meta:
-        fields = ("id", "username")
+# class UserSchema(ma.Schema):
+#     class Meta:
+#         fields = ("id", "username")
 
-users_schema = UserSchema()
-users_schema = UserSchema(many=True)
+# users_schema = UserSchema()
+# users_schema = UserSchema(many=True)
 
 socketio = SocketIO(app, cors_allowed_origins = '*')
 
