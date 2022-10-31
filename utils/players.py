@@ -22,10 +22,13 @@ class Players():
     def addPlayer(self, roomID, username):
         print(self.games)
         game = [game for game in self.games if game["roomID"] == roomID]
-        print(game[0])
-        game[0]["players"].append(username)
-        print(game[0]["players"])
-        return game
+        if (game):
+            print(game[0])
+            game[0]["players"].append(username)
+            print(game[0]["players"])
+            return game
+        else:
+            return False
 
     def grabPlayers(self,roomID):
         game = [game for game in self.games if game["roomID"] == roomID]

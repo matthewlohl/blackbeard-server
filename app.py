@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, render_template, request, session, abort
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
@@ -120,11 +120,12 @@ def joinRoom(gameDetails):
     roomID = gameDetails["roomID"]
     username = gameDetails["username"]
     print(roomID)
+    player.addPlayer(roomID, username)
     join_room(roomID)
     print('Player ' + username + " just joined Room "+ roomID)
-    player.addPlayer(roomID, username)
-
     emit(username, broadcast = True)
+    return True
+
 
 @socketio.on('lobby')
 def lobby(gameDetails):
