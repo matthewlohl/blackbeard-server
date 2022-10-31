@@ -17,6 +17,7 @@ gunicorn = "*"
 psycopg2 = "*"
 psycopg2-binary = "*"
 marshmallow-sqlalchemy = "*"
+flask-session = "*"
 
 [dev-packages]
 
