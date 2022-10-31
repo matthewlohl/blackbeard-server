@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, render_template, request, session, abort
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
@@ -58,7 +58,6 @@ def register():
             "username": new_user.username
         })
 
-@cross_origin
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     username = request.json["username"]
@@ -93,26 +92,48 @@ def get_current_user():
     return jsonify({
         "id": user.id,
         "username": user.username
-    })
+    }), 201
 
 # --- SOCKETS --- 
 
-players = []
+from utils.players import Players
 
-# @socketio.on('connect')
-# def connection(socket):
-#     print('A new player just connected on'+socket.id)
+player = Players()
 
-# @socketio.on('create')
-# def createRoom(data):
-#     print("Room ID "+ data['roomID'] + " has been created")
-#     print(data['creator'] + " has created the room")
-#     join_room(data['roomID'])
-#     # roomData = {'roomID': data['roomID'], 'username': [data['username']]}
-#     players.append(data['creator'])
-#     print(players)
-#     send(data['roomID'] + ' has been created', to=data['roomID'])
-#     send(players, broadcast = True)
+@socketio.on('connect')
+def connection():
+    print('A new player just connected')
+
+@socketio.on('create')
+def createRoom(gameDetails):
+    roomID = gameDetails["roomID"]
+    host = gameDetails["host"]
+    players = []
+    join_room(roomID)
+    print("Room ID "+ roomID + " has been created")
+    print(host + " has created the room")
+    player.addGame(roomID, host, players)
+    emit(host, broadcast = True)
+
+@socketio.on('join')
+def joinRoom(gameDetails):
+    roomID = gameDetails["roomID"]
+    username = gameDetails["username"]
+    print(roomID)
+    player.addPlayer(roomID, username)
+    join_room(roomID)
+    print('Player ' + username + " just joined Room "+ roomID)
+    emit(username, broadcast = True)
+    return True
+
+
+@socketio.on('lobby')
+def lobby(gameDetails):
+    host = player.grabHost(gameDetails["roomID"])
+    players = player.grabPlayers(gameDetails["roomID"])
+    print(host, players)
+    send((host, players), broadcast = True)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

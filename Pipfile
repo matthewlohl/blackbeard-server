@@ -12,6 +12,7 @@ flask-sqlalchemy = "*"
 flask-cors = "*"
 flask-socketio = "*"
 flask-marshmallow = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
