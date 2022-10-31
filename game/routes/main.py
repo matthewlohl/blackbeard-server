@@ -1,5 +1,5 @@
 # #import dependencies
-from flask import Blueprint, jsonify, request, session
+from flask import Flask, Blueprint, jsonify, request, session
 from flask_bcrypt import Bcrypt
 # from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
@@ -9,14 +9,14 @@ from flask_marshmallow import Marshmallow
 from ..database.db import db
 from ..models.models import users
 
-app = Blueprint("main", __name__)
+# app = Blueprint("main", __name__)
 
 # from game.config import ApplicationConfig
 
 # from game.models.models import db, users
 
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
 # app.config.from_object(ApplicationConfig)
 
@@ -48,7 +48,7 @@ socketio = SocketIO(app, cors_allowed_origins = '*')
 
 # --- ROUTES --- 
 
-@app.routes("/")
+@app.route("/")
 def home():
     return "Welcome to Black Beard's Island API"
 
@@ -108,7 +108,7 @@ def get_current_user():
 
 # --- SOCKETS --- 
 
-from utils.players import Players
+from ..utils.players import Players
 
 player = Players()
 
