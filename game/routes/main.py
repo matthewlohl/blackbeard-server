@@ -6,7 +6,7 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 from flask_marshmallow import Marshmallow
 
 # #import models, database
-from ..database.db import db
+from ..database import db
 from ..models.models import users
 
 # app = Blueprint("main", __name__)
@@ -33,7 +33,7 @@ ma = Marshmallow(app)
 # --- Define your output format with marshmallow. --- 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "username")
+        fields = ("id", "username", "games_won")
 
 users_schema = UserSchema()
 users_schema = UserSchema(many=True)
