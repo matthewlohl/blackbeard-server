@@ -20,7 +20,8 @@ python-dotenv = "*"
 python_version = "3.10"
 
 [scripts]
-start = "gunicorn -k eventlet -w 1 app:app"
-dev = "bash -c \"export FLASK_ENV='development' && flask run --host=0.0.0.0 \""
+init_db = "python init_db.py"
+start = "gunicorn listings:app"
+dev = "flask run -p ${PORT}"
 test = "pytest ."
 coverage = "pytest --cov-report term-missing --cov=."

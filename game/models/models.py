@@ -1,6 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy 
-
-db = SQLAlchemy()
+# from flask_sqlalchemy import SQLAlchemy 
+# db = SQLAlchemy()
+from ..database.db import db
 
 #create a model
 class users(db.Model):
@@ -8,7 +8,4 @@ class users(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-
-    # def __init__(self, username, email):
-    #     self.username = username
-    #     self.email = email
+    games_won = db.Column(db.Integer)
