@@ -1,27 +1,34 @@
-from flask import Flask, jsonify, render_template, request, session, abort
+# #import dependencies
+from flask import Blueprint, jsonify, request, session
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS, cross_origin
+# from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 from flask_marshmallow import Marshmallow
 
-from config import ApplicationConfig
+# #import models, database
+from ..database.db import db
+from ..models.models import users
 
-from models import db, users
+app = Blueprint("main", __name__)
+
+# from game.config import ApplicationConfig
+
+# from game.models.models import db, users
 
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-app.config.from_object(ApplicationConfig)
+# app.config.from_object(ApplicationConfig)
 
 # --- using dependencies in app ---
 
 bcrypt = Bcrypt(app)
 ma = Marshmallow(app)
-cors = CORS(app, resource={
-    r"/*": {
-        "origins": "*"
-    }
-}, supports_credentials=True)
+# cors = CORS(app, resource={
+#     r"/*": {
+#         "origins": "*"
+#     }
+# }, supports_credentials=True)
 
 # --- Define your output format with marshmallow. --- 
 class UserSchema(ma.Schema):
@@ -35,11 +42,16 @@ socketio = SocketIO(app, cors_allowed_origins = '*')
 
 # --- create database ---
 
-db.init_app(app)
-with app.app_context():
-    db.create_all()
+# db.init_app(app)
+# with app.app_context():
+#     db.create_all()
 
 # --- ROUTES --- 
+
+@app.routes("/")
+def home():
+    return "Welcome to Black Beard's Island API"
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -135,5 +147,5 @@ def lobby(gameDetails):
     send((host, players), broadcast = True)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
