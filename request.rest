@@ -11,11 +11,11 @@ GET http://localhost:5000/subscribe/0
 GET http://localhost:5000/users/1
 ###
 
-POST http://localhost:5000/register
+POST http://0.0.0.0:5001/register
 Content-Type: application/json
 
 {
-"username": "User3", "password": "jkljkl"
+"username": "User1", "password": "jkljkl"
 }
 
 ###
