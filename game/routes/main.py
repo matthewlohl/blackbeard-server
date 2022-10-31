@@ -1,12 +1,13 @@
 # #import dependencies
 from flask import Flask, Blueprint, jsonify, request, session
+# from flask.ext.session import Session
 from flask_bcrypt import Bcrypt
 # from flask_cors import CORS, cross_origin
 from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
 from flask_marshmallow import Marshmallow
 
 # #import models, database
-from ..database import db
+from ..database.db import db
 from ..models.models import users
 
 # app = Blueprint("main", __name__)
@@ -24,6 +25,7 @@ app = Flask(__name__)
 
 bcrypt = Bcrypt(app)
 ma = Marshmallow(app)
+# Session(app)
 # cors = CORS(app, resource={
 #     r"/*": {
 #         "origins": "*"
@@ -33,12 +35,14 @@ ma = Marshmallow(app)
 # --- Define your output format with marshmallow. --- 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "username", "games_won")
+        fields = ("user_id", "username", "games_won")
 
 users_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
-socketio = SocketIO(app, cors_allowed_origins = '*')
+# socketio = SocketIO(app, cors_allowed_origins = '*')
+socketio = SocketIO(app)
+socketio.init_app(app, cors_allowed_origins = '*')
 
 # --- create database ---
 
@@ -62,7 +66,7 @@ def register():
     if user_exist:
         return jsonify({"error": "User already exists"}),409
     hashed_password = bcrypt.generate_password_hash(password)
-    new_user = users( username= username, password=hashed_password)
+    new_user = users( username= username, password=hashed_password, games_won = 0)
     db.session.add(new_user)
     db.session.commit()
 
@@ -83,11 +87,11 @@ def login():
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Unauthorized"}), 401
 
-    session["user_id"] = user.id
+    session["user_id"] = user.user_id
     session["username"] = user.username
 
     response = jsonify({
-        "id": user.id,
+        "id": user.user_id,
         "username": user.username
     })
 
@@ -100,9 +104,9 @@ def get_current_user():
     user_id = session.get("user_id")
     if not user_id:
         return jsonify({"error": "Unauthorized"}), 401
-    user = users.query.filter_by(id=user_id).first()
+    user = users.query.filter_by(user_id=user_id).first()
     return jsonify({
-        "id": user.id,
+        "id": user.user_id,
         "username": user.username
     }), 201
 
