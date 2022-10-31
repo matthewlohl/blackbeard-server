@@ -6,7 +6,7 @@ from flask import Flask
 
 #import models, database
 from .database.db import db
-from .routes.app import app
+from .routes.main import app
 
 #Load environment variables
 
@@ -19,7 +19,7 @@ if 'postgres:' in database_uri:
 
 # Set up the app
 
-app = Flask(__name__)
+# app = Flask(__name__)
 app.config.update(
     SQLALCHEMY_DATABASE_URI=database_uri,
     SQLALCHEMY_TRACK_MODIFICATIONS=environ.get('SQLALCHEMY_TRACK_MODIFICATIONS')
@@ -36,7 +36,7 @@ cors = CORS(app, resource={
 db.app=app
 db.init_app(app)
 
-app.register_blueprint(app)
+# app.register_blueprint(main_routes)
 
 # Main
 if __name__ == "__main__":
