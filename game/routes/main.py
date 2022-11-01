@@ -1,63 +1,26 @@
-# #import dependencies
+# import dependencies
 from flask import Flask, Blueprint, jsonify, request, session
-# from flask.ext.session import Session
 from flask_bcrypt import Bcrypt
-# from flask_cors import CORS, cross_origin
-from flask_socketio import SocketIO, send, emit, join_room, leave_room, rooms
-from flask_marshmallow import Marshmallow
 
-# #import models, database
+# import models, database
 from ..database.db import db
 from ..models.models import users
 
-# app = Blueprint("main", __name__)
-
-# from game.config import ApplicationConfig
-
-# from game.models.models import db, users
-
-
-app = Flask(__name__)
-
-# app.config.from_object(ApplicationConfig)
+main_routes = Blueprint("main", __name__)
 
 # --- using dependencies in app ---
-
+app = Flask(__name__)
 bcrypt = Bcrypt(app)
-ma = Marshmallow(app)
-# Session(app)
-# cors = CORS(app, resource={
-#     r"/*": {
-#         "origins": "*"
-#     }
-# }, supports_credentials=True)
 
-# --- Define your output format with marshmallow. --- 
-class UserSchema(ma.Schema):
-    class Meta:
-        fields = ("user_id", "username", "games_won")
-
-users_schema = UserSchema()
-users_schema = UserSchema(many=True)
-
-# socketio = SocketIO(app, cors_allowed_origins = '*')
-socketio = SocketIO(app)
-socketio.init_app(app, cors_allowed_origins = '*')
-
-# --- create database ---
-
-# db.init_app(app)
-# with app.app_context():
-#     db.create_all()
 
 # --- ROUTES --- 
 
-@app.route("/")
+@main_routes.route("/")
 def home():
     return "Welcome to Black Beard's Island API"
 
 
-@app.route('/register', methods=['POST'])
+@main_routes.route('/register', methods=['POST'])
 def register():
     username = request.json['username']
     password = request.json['password']
@@ -74,7 +37,7 @@ def register():
             "username": new_user.username
         })
 
-@app.route('/login', methods=['POST', 'GET'])
+@main_routes.route('/login', methods=['POST', 'GET'])
 def login():
     username = request.json["username"]
     password = request.json["password"]
@@ -87,11 +50,11 @@ def login():
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Unauthorized"}), 401
 
-    session["user_id"] = user.user_id
+    session["user_id"] = user.id
     session["username"] = user.username
 
     response = jsonify({
-        "id": user.user_id,
+        "id": user.id,
         "username": user.username
     })
 
@@ -99,7 +62,7 @@ def login():
 
     return response, 201
 
-@app.route('/user')
+@main_routes.route('/user')
 def get_current_user():
     user_id = session.get("user_id")
     if not user_id:
@@ -109,47 +72,3 @@ def get_current_user():
         "id": user.user_id,
         "username": user.username
     }), 201
-
-# --- SOCKETS --- 
-
-from ..utils.players import Players
-
-player = Players()
-
-@socketio.on('connect')
-def connection():
-    print('A new player just connected')
-
-@socketio.on('create')
-def createRoom(gameDetails):
-    roomID = gameDetails["roomID"]
-    host = gameDetails["host"]
-    players = []
-    join_room(roomID)
-    print("Room ID "+ roomID + " has been created")
-    print(host + " has created the room")
-    player.addGame(roomID, host, players)
-    emit(host, broadcast = True)
-
-@socketio.on('join')
-def joinRoom(gameDetails):
-    roomID = gameDetails["roomID"]
-    username = gameDetails["username"]
-    print(roomID)
-    player.addPlayer(roomID, username)
-    join_room(roomID)
-    print('Player ' + username + " just joined Room "+ roomID)
-    emit(username, broadcast = True)
-    return True
-
-
-@socketio.on('lobby')
-def lobby(gameDetails):
-    host = player.grabHost(gameDetails["roomID"])
-    players = player.grabPlayers(gameDetails["roomID"])
-    print(host, players)
-    send((host, players), broadcast = True)
-
-
-if __name__ == '__main__':
-    socketio.run(app)
