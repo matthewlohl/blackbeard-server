@@ -1,1 +1,1 @@
-web: pipenv run start
+web: gunicorn --worker-class eventlet -w 1 game:app

@@ -42,8 +42,8 @@ db.app=app
 db.init_app(app)
 bcrypt = Bcrypt(app)
 ma = Marshmallow(app)
-# with app.app_context():
-#     db.create_all()
+
+
 class UserSchema(ma.Schema):
     class Meta:
         fields = ("user_id", "username", "games_won")
@@ -52,8 +52,7 @@ users_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 
-socketio = SocketIO(app)
-socketio.init_app(app, cors_allowed_origins = '*')
+socketio = SocketIO(app,logger=True,engineio_logger=True,cors_allowed_origins = '*')
 
 # --- ROUTES --- 
 
@@ -161,4 +160,4 @@ def lobby(gameDetails):
 # Main
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
-    socketio.run(app, debug=True, port=port)
+    socketio.run(app, debug=False, port=port)
