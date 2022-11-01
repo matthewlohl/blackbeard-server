@@ -11,11 +11,11 @@ GET http://localhost:5000/subscribe/0
 GET http://localhost:5000/users/1
 ###
 
-POST https://black-beard-island.herokuapp.com/register
+POST http://127.0.0.1:5001/register
 Content-Type: application/json
 
 {
-"username": "User4", "password": "jkljkl"
+"username": "Stefan", "password": "12345"
 }
 
 ###
@@ -24,11 +24,11 @@ POST http://127.0.0.1:5001/login
 Content-Type: application/json
 
 {
-"username": "User1", "password": "jkljkl"
+"username": "Matt", "password": "12345"
 }
 ###
 
-GET http://localhost:5000/@me
+GET http://127.0.0.1:5001/users
 # Content-Type: application/json
 
 ###

@@ -62,10 +62,17 @@ def login():
 
     return response, 201
 
-@main_routes.route('/users')
+@main_routes.route('/users', methods=['GET'])
 def get_all_users():
-    all_users = users.query.all()
-    return all_users, 200
+    all_users = users.query.with_entities(users.username, users.games_won)
+    players = []
+    for user in all_users:
+        players.append({
+            "usernane": user.username,
+            "games_won": user.games_won
+            })
+    return players, 200
+
 
 @main_routes.route('/user')
 def get_current_user():
