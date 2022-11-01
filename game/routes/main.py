@@ -54,7 +54,7 @@ def login():
     session["username"] = user.username
 
     response = jsonify({
-        "id": user.id,
+        "id": user.user_id,
         "username": user.username
     })
 
