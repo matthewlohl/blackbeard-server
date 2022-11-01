@@ -18,6 +18,7 @@ psycopg2 = "*"
 psycopg2-binary = "*"
 marshmallow-sqlalchemy = "*"
 flask-session = "*"
+eventlet = "*"
 
 [dev-packages]
 pytest = "*"
