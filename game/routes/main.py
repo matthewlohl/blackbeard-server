@@ -64,7 +64,7 @@ def login():
 
 @main_routes.route('/users')
 def get_all_users():
-    all_users = users.first()
+    all_users = users.query.all()
     return jsonify({
         all_users
     }), 200
