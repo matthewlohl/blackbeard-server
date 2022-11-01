@@ -62,6 +62,12 @@ def login():
 
     return response, 201
 
+@main_routes.route('/users')
+def get_all_users():
+    return jsonify({
+        users
+    }), 200
+
 @main_routes.route('/user')
 def get_current_user():
     user_id = session.get("user_id")
