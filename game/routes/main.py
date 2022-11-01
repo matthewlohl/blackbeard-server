@@ -28,7 +28,7 @@ def register():
         
     if user_exist:
         return jsonify({"error": "User already exists"}),409
-    hashed_password = bcrypt.generate_password_hash(password)
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = users( username= username, password=hashed_password, games_won = 0)
     db.session.add(new_user)
     db.session.commit()
