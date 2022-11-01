@@ -68,7 +68,7 @@ def get_all_users():
     players = []
     for user in all_users:
         players.append({
-            "usernane": user.username,
+            "username": user.username,
             "games_won": user.games_won
             })
     return players, 200
