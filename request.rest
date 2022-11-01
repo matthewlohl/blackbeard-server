@@ -11,7 +11,7 @@ GET http://localhost:5000/subscribe/0
 GET http://localhost:5000/users/1
 ###
 
-POST http://127.0.0.1:5001/register
+POST https://black-beard-island.herokuapp.com/register
 Content-Type: application/json
 
 {
