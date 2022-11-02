@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from functools import wraps
 import jwt
 
+
 # import models, database
 from ..database.db import db
 from ..models.models import users
@@ -14,7 +15,7 @@ main_routes = Blueprint("main", __name__)
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY']='1ef10e845d42fa327de97f1991928bc5'
-
+# jwt = JWT(app)
 # --- ROUTES --- 
 
 @main_routes.route("/")
@@ -34,10 +35,12 @@ def register():
     new_user = users( username= username, password=hashed_password, games_won = 0)
     db.session.add(new_user)
     db.session.commit()
-
-    return jsonify({
+    response = jsonify({
             "username": new_user.username
         })
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 201
 
 @main_routes.route('/login', methods=['POST', 'GET'])
 def login():
@@ -58,13 +61,16 @@ def login():
     session["user_id"] = user.user_id
     session["username"] = user.username
 
-    response = jsonify({
+    print(token)
+    token_decoded = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+    print(token_decoded)
+    return jsonify({
         # "id": user.user_id,
-        # "username": user.username
-        'token': token.decode('UTF-8')
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response, 201
+        # "username": user.username,
+        'token': token
+    }), 201
+    # response.headers.add('Access-Control-Allow-Origin', '*')
+    # return response, 201
 
 # decorator for verifying the JWT
 def token_required(f):
@@ -80,7 +86,7 @@ def token_required(f):
   
         try:
             # decoding the payload to fetch the stored details
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         except:
             return jsonify({
                 'message' : 'Token is invalid !!'
@@ -91,7 +97,6 @@ def token_required(f):
     return decorated
 
 @main_routes.route('/users', methods=['GET'])
-@token_required
 def get_all_users():
     all_users = users.query.with_entities(users.username, users.games_won)
     players = []
@@ -102,7 +107,16 @@ def get_all_users():
             })
     return players, 200
 
-
-
+@main_routes.route('/token', methods=['GET'])
+@token_required
+def token_validation():
+    all_users = users.query.with_entities(users.username, users.games_won)
+    players = []
+    for user in all_users:
+        players.append({
+            "username": user.username,
+            "games_won": user.games_won
+            })
+    return players, 200
 
     
