@@ -23,6 +23,7 @@ pycparser==2.21
 pydantic==1.10.2
 pyOpenSSL==22.1.0
 pyparsing==3.0.9
+PyJWT==1.7.1
 python-dotenv==0.21.0
 python-engineio==4.3.4
 python-socketio==5.7.2

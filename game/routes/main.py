@@ -1,6 +1,8 @@
 # import dependencies
-from flask import Flask, Blueprint, jsonify, request, session
+from flask import Flask, Blueprint, jsonify, request, session, make_response
 from flask_bcrypt import Bcrypt
+from functools import wraps
+import jwt
 
 # import models, database
 from ..database.db import db
@@ -11,7 +13,7 @@ main_routes = Blueprint("main", __name__)
 # --- using dependencies in app ---
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
-
+app.config['SECRET_KEY']='1ef10e845d42fa327de97f1991928bc5'
 
 # --- ROUTES --- 
 
@@ -41,28 +43,55 @@ def register():
 def login():
     username = request.json["username"]
     password = request.json["password"]
-
     user = users.query.filter_by(username=username).first()
 
     if user is None:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"error": "User doesn't not exist"}), 401
     
     if not bcrypt.check_password_hash(user.password, password):
         return jsonify({"error": "Unauthorized"}), 401
 
+
+    token = jwt.encode({
+            'username': user.username
+        }, app.config['SECRET_KEY'])
     session["user_id"] = user.user_id
     session["username"] = user.username
 
     response = jsonify({
-        "id": user.user_id,
-        "username": user.username
+        # "id": user.user_id,
+        # "username": user.username
+        'token': token.decode('UTF-8')
     })
-
     response.headers.add('Access-Control-Allow-Origin', '*')
-
     return response, 201
 
+# decorator for verifying the JWT
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        # jwt is passed in the request header
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization']
+        # return 401 if token is not passed
+        if not token:
+            return jsonify({'message' : 'Token is missing !!'}), 401
+  
+        try:
+            # decoding the payload to fetch the stored details
+            data = jwt.decode(token, app.config['SECRET_KEY'])
+        except:
+            return jsonify({
+                'message' : 'Token is invalid !!'
+            }), 401
+        # returns the current logged in users contex to the routes
+        return  f( *args, **kwargs)
+  
+    return decorated
+
 @main_routes.route('/users', methods=['GET'])
+@token_required
 def get_all_users():
     all_users = users.query.with_entities(users.username, users.games_won)
     players = []
@@ -74,13 +103,6 @@ def get_all_users():
     return players, 200
 
 
-@main_routes.route('/user')
-def get_current_user():
-    user_id = session.get("user_id")
-    if not user_id:
-        return jsonify({"error": "Unauthorized"}), 401
-    user = users.query.filter_by(user_id=user_id).first()
-    return jsonify({
-        "id": user.user_id,
-        "username": user.username
-    }), 201
+
+
+    

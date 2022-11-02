@@ -1,3 +1,5 @@
+from os import environ
+
 def test_home(api):
     """Page loads"""
     resp = api.get('/')

@@ -20,10 +20,11 @@ if 'postgres:' in database_uri:
 # Set up the app
 
 app = Flask(__name__)
+
 app.secret_key = 'BAD_SECRET_KEY'
 app.config.update(
     SQLALCHEMY_DATABASE_URI=database_uri,
-    SQLALCHEMY_TRACK_MODIFICATIONS=environ.get('SQLALCHEMY_TRACK_MODIFICATIONS')
+    SQLALCHEMY_TRACK_MODIFICATIONS=environ.get('SQLALCHEMY_TRACK_MODIFICATIONS'),
 )
 
 # --- using dependencies in app ---
