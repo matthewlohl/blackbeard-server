@@ -15,7 +15,7 @@ main_routes = Blueprint("main", __name__)
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
 app.config['SECRET_KEY']='1ef10e845d42fa327de97f1991928bc5'
-# jwt = JWT(app)
+
 # --- ROUTES --- 
 
 @main_routes.route("/")
@@ -118,5 +118,23 @@ def token_validation():
             "games_won": user.games_won
             })
     return players, 200
+
+@main_routes.route('/gameover', methods=['GET', 'POST'])
+@token_required
+def add_score():
+    winner = request.json["username"]
+    user = users.query.filter_by(username=winner).first()
+    if user is None:
+        return jsonify({"error": "User doesn't not exist"}), 401
+    user.games_won += 1
+    db.session.add(user)
+    db.session.commit()
+    response = jsonify({
+            "username": user.username,
+            "games_won": user.games_won
+        })
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response, 201
 
     
