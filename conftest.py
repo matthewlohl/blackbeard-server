@@ -1,5 +1,5 @@
 import pytest
-from game.routes.main import app
+from test import app
 
 @pytest.fixture
 def api():
